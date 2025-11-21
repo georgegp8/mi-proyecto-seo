@@ -19,13 +19,7 @@ export default function Home() {
       </Head>
 
       <h1>Bienvenido</h1>
-      <Image
-        src="/images/cocker-spaniel.webp"
-        width={800}
-        height={400}
-        alt="Ejemplo de imagen optimizada"
-        priority
-      />
+
       <DynamicComponent />
     </>
   );
