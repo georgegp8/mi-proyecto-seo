@@ -2,6 +2,8 @@
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const API_BASE = "https://web-production-0c2d.up.railway.app";
 
@@ -47,122 +49,122 @@ export default function Productos() {
         <meta name="twitter:description" content={`Los mejores ${componentType} al mejor precio`} />
       </Head>
 
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "2rem" }}>
-        <Link href="/" style={{ textDecoration: "none", color: "#3b82f6", marginBottom: "1rem", display: "inline-block" }}>
-          ← Volver al inicio
-        </Link>
+      <Navbar />
 
-        <h1 style={{ fontSize: "2.5rem", fontWeight: "900", marginBottom: "2rem" }}>
-          Catálogo de Componentes 🛒
-        </h1>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="inline-flex items-center text-purple-600 hover:text-purple-800 font-semibold mb-6 transition-colors">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver al inicio
+          </Link>
 
-        {/* Filtros */}
-        <div style={{ marginBottom: "2rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-          <div>
-            <label style={{ fontWeight: "600", marginRight: "0.5rem" }}>Tienda:</label>
-            <select 
-              value={store} 
-              onChange={(e) => setStore(e.target.value)}
-              style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #d1d5db" }}
-            >
-              <option value="sercoplus">SercoPlus</option>
-              <option value="pcimpacto">PCImpacto</option>
-              <option value="memorykings">MemoryKings</option>
-            </select>
-          </div>
+          <h1 className="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+            Catálogo de Componentes
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">Explora nuestra selección de productos de alta calidad</p>
 
-          <div>
-            <label style={{ fontWeight: "600", marginRight: "0.5rem" }}>Categoría:</label>
-            <select 
-              value={componentType} 
-              onChange={(e) => setComponentType(e.target.value)}
-              style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #d1d5db" }}
-            >
-              <option value="procesadores">Procesadores</option>
-              <option value="tarjetas-video">Tarjetas de Video</option>
-              <option value="memorias-ram">Memorias RAM</option>
-              <option value="almacenamiento">Almacenamiento</option>
-              <option value="placas-madre">Placas Madre</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Productos */}
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "3rem", fontSize: "1.25rem" }}>
-            Cargando productos...
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.5rem" }}>
-            {products.map((product, index) => (
-              <div 
-                key={index} 
-                style={{ 
-                  border: "1px solid #e5e7eb", 
-                  borderRadius: "8px", 
-                  padding: "1rem",
-                  backgroundColor: "white",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
-                }}
-              >
-                {product.image_url && (
-                  <img 
-                    src={product.image_url} 
-                    alt={product.name}
-                    style={{ width: "100%", height: "200px", objectFit: "contain", marginBottom: "1rem" }}
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                )}
-                <h3 style={{ fontSize: "1rem", fontWeight: "600", marginBottom: "0.5rem", minHeight: "3rem" }}>
-                  {product.name}
-                </h3>
-                <p style={{ color: "#6b7280", marginBottom: "0.5rem" }}>
-                  <strong>Marca:</strong> {product.brand}
-                </p>
-                <p style={{ fontSize: "1.5rem", fontWeight: "700", color: "#3b82f6", marginBottom: "0.5rem" }}>
-                  ${product.price_usd?.toFixed(2)} USD
-                </p>
-                <p style={{ color: "#6b7280", marginBottom: "0.5rem" }}>
-                  S/ {product.price_local?.toFixed(2)} PEN
-                </p>
-                <p style={{ 
-                  fontSize: "0.875rem", 
-                  fontWeight: "600",
-                  color: product.stock > 0 ? "#10b981" : "#ef4444",
-                  marginBottom: "1rem"
-                }}>
-                  {product.stock > 0 ? `En stock: ${product.stock}` : "Sin stock"}
-                </p>
-                {product.source_url && (
-                  <a 
-                    href={product.source_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style={{ 
-                      display: "block", 
-                      textAlign: "center",
-                      padding: "0.5rem", 
-                      backgroundColor: "#3b82f6", 
-                      color: "white", 
-                      borderRadius: "4px",
-                      textDecoration: "none",
-                      fontWeight: "600"
-                    }}
-                  >
-                    Ver en {store}
-                  </a>
-                )}
+          {/* Filtros */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Filtros</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Tienda:</label>
+                <select 
+                  value={store} 
+                  onChange={(e) => setStore(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+                >
+                  <option value="sercoplus">SercoPlus</option>
+                  <option value="pcimpacto">PCImpacto</option>
+                  <option value="memorykings">MemoryKings</option>
+                </select>
               </div>
-            ))}
-          </div>
-        )}
 
-        {!loading && products.length === 0 && (
-          <div style={{ textAlign: "center", padding: "3rem", fontSize: "1.25rem", color: "#6b7280" }}>
-            No se encontraron productos
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría:</label>
+                <select 
+                  value={componentType} 
+                  onChange={(e) => setComponentType(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+                >
+                  <option value="procesadores">Procesadores</option>
+                  <option value="tarjetas-video">Tarjetas de Video</option>
+                  <option value="memorias-ram">Memorias RAM</option>
+                  <option value="almacenamiento">Almacenamiento</option>
+                  <option value="placas-madre">Placas Madre</option>
+                </select>
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Productos */}
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="inline-block w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-4 text-xl text-gray-600">Cargando productos...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product, index) => (
+                <div 
+                  key={index} 
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group hover:scale-105"
+                >
+                  {product.image_url && (
+                    <div className="bg-gray-50 p-4 h-48 flex items-center justify-center">
+                      <img 
+                        src={product.image_url} 
+                        alt={product.name}
+                        className="max-h-full max-w-full object-contain"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h3 className="text-sm font-semibold mb-3 text-gray-800 min-h-[3rem] line-clamp-2 group-hover:text-purple-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      <strong>Marca:</strong> {product.brand}
+                    </p>
+                    <div className="border-t border-gray-200 pt-3 mt-3">
+                      <p className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 mb-1">
+                        ${product.price_usd?.toFixed(2)}
+                      </p>
+                      <p className="text-sm text-gray-500 mb-3">
+                        S/ {product.price_local?.toFixed(2)}
+                      </p>
+                      <p className={`text-sm font-semibold mb-4 ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {product.stock > 0 ? `✓ En stock: ${product.stock}` : '✗ Sin stock'}
+                      </p>
+                      {product.source_url && (
+                        <a 
+                          href={product.source_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block text-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:scale-105 transform transition-all duration-300 shadow-lg"
+                        >
+                          Ver en tienda
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!loading && products.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-2xl text-gray-500">No se encontraron productos</p>
+            </div>
+          )}
+        </div>
       </div>
+
+      <Footer />
     </>
   );
 }
