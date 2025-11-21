@@ -2,7 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://mi-proyecto-seo.vercel.app/sitemap.xml
-
-# Crawl-delay
-Crawl-delay: 1
+Sitemap: https://mi-proyecto-seo-psi.vercel.app/sitemap.xml
