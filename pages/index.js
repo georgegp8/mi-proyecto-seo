@@ -17,7 +17,7 @@ export default function Home() {
 
       <h1>Bienvenido</h1>
       <Image
-        src="/images/seo-image.png"
+        src="/images/cocker-spaniel.webp"
         width={800}
         height={400}
         alt="Ejemplo de imagen optimizada"
