@@ -5,10 +5,18 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
+const API_BASE = "https://web-production-0c2d.up.railway.app";
+
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [currentStore, setCurrentStore] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("procesadores");
+  const [selectedStoresFilter, setSelectedStoresFilter] = useState([]);
+  const [selectedBrandsFilter, setSelectedBrandsFilter] = useState([]);
+  const [priceRangeFilter, setPriceRangeFilter] = useState([0, 1000]);
+  const [onlyStock, setOnlyStock] = useState(true); // Por defecto solo con stock
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -16,21 +24,111 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Auto-rotate carousel
+  // Cargar productos iniciales al montar el componente
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 5);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
+    loadInitialProducts();
+  }, [selectedCategory]);
 
-  // Auto-rotate stores
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentStore((prev) => (prev + 1) % 4);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, []);
+  // Función para cargar productos iniciales (con stock por defecto)
+  const loadInitialProducts = async () => {
+    setSearching(true);
+    try {
+      const storeNames = ["computershop", "cyccomputer", "pcimpacto", "sercoplus"];
+      const promises = storeNames.map(store =>
+        fetch(`${API_BASE}/api/stores/${store}/products?component_type=${selectedCategory}&limit=50`)
+          .then(res => res.json())
+          .then(data => ({
+            store,
+            products: (data.products || []).map(p => ({ ...p, storeName: store }))
+          }))
+          .catch(() => ({ store, products: [] }))
+      );
+
+      const results = await Promise.all(promises);
+      
+      // Agrupar productos similares por nombre
+      const grouped = {};
+      results.forEach(result => {
+        result.products.forEach(product => {
+          const key = product.name.toLowerCase().trim();
+          if (!grouped[key]) {
+            grouped[key] = {
+              name: product.name,
+              brand: product.brand,
+              image_url: product.image_url,
+              stores: []
+            };
+          }
+          grouped[key].stores.push({
+            storeName: result.store,
+            price_usd: product.price_usd,
+            price_local: product.price_local,
+            stock: product.stock,
+            source_url: product.source_url
+          });
+        });
+      });
+
+      // Aplicar filtros
+      let resultsArray = Object.values(grouped);
+      resultsArray = applyFilters(resultsArray);
+      
+      setSearchResults(resultsArray);
+    } catch (error) {
+      console.error("Error loading products:", error);
+    }
+    setSearching(false);
+  };
+
+  // Función para aplicar filtros
+  const applyFilters = (resultsArray) => {
+    // Filtrar por búsqueda
+    if (searchQuery.trim()) {
+      resultsArray = resultsArray.filter(r => 
+        r.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Filtrar por marcas
+    if (selectedBrandsFilter.length > 0) {
+      resultsArray = resultsArray.filter(r => selectedBrandsFilter.includes(r.brand));
+    }
+    
+    // Filtrar por tiendas
+    if (selectedStoresFilter.length > 0) {
+      resultsArray = resultsArray.map(r => ({
+        ...r,
+        stores: r.stores.filter(s => selectedStoresFilter.includes(s.storeName))
+      })).filter(r => r.stores.length > 0);
+    }
+    
+    // Filtrar por precio
+    resultsArray = resultsArray.map(r => ({
+      ...r,
+      stores: r.stores.filter(s => 
+        s.price_usd >= priceRangeFilter[0] && s.price_usd <= priceRangeFilter[1]
+      )
+    })).filter(r => r.stores.length > 0);
+    
+    // Filtrar solo con stock
+    if (onlyStock) {
+      resultsArray = resultsArray.map(r => ({
+        ...r,
+        stores: r.stores.filter(s => s.stock > 0)
+      })).filter(r => r.stores.length > 0);
+    }
+
+    return resultsArray;
+  };
+
+  // Función de búsqueda/filtrado
+  const handleSearch = () => {
+    loadInitialProducts();
+  };
+
+  // Obtener marcas únicas de los resultados
+  const availableBrands = [...new Set(searchResults.map(r => r.brand).filter(Boolean))].sort();
+  const storesList = ["computershop", "cyccomputer", "pcimpacto", "sercoplus"];
 
   const categories = [
     { 
@@ -170,166 +268,306 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section con Carousel */}
-        <section className="py-20 bg-white">
+        {/* Price Comparison Section */}
+        <section className="py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-8">
               <h2 className="text-5xl font-black mb-4 text-gray-900 tracking-tight">
-                Categorías Destacadas
+                Comparador de Precios
               </h2>
               <p className="text-gray-600 text-xl max-w-2xl mx-auto">
-                Explora nuestra amplia selección de componentes de alta calidad
+                Encuentra el mejor precio por componente entre todas nuestras tiendas
               </p>
             </div>
 
-            {/* Carousel Container */}
-            <div className="relative max-w-5xl mx-auto">
-              <div className="overflow-hidden rounded-3xl shadow-2xl">
-                <div 
-                  className="flex transition-transform duration-700 ease-out"
-                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                >
-                  {categories.map((item, index) => (
-                    <div key={index} className="min-w-full px-4">
-                      <div className={`relative bg-gradient-to-br ${item.color} rounded-3xl overflow-hidden shadow-2xl hover:scale-105 transition-transform duration-300`}>
-                        <div className="absolute inset-0 opacity-20">
-                          <img 
-                            src={item.image} 
-                            alt={item.title}
-                            className="w-full h-full object-cover"
+            {/* Layout con Filtros Laterales */}
+            <div className="flex gap-6">
+              {/* Filtros Izquierda - Categoría y Búsqueda */}
+              <aside className="w-64 flex-shrink-0">
+                <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-5 sticky top-4">
+                  <h3 className="text-lg font-black text-gray-900 mb-4 pb-3 border-b-2 border-orange-500">
+                    Buscar
+                  </h3>
+                  
+                  {/* Categoría */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      Categoría
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none text-sm"
+                    >
+                      <option value="procesadores">Procesadores</option>
+                      <option value="tarjetas-video">Tarjetas de Video</option>
+                      <option value="memorias-ram">Memorias RAM</option>
+                      <option value="almacenamiento">Almacenamiento</option>
+                      <option value="placas-madre">Placas Madre</option>
+                    </select>
+                  </div>
+
+                  {/* Búsqueda */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      Producto
+                    </label>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      placeholder="Ej: Ryzen 5, RTX 4060"
+                      className="w-full px-3 py-2 bg-white border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none text-sm"
+                    />
+                  </div>
+
+                  {/* Marcas */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      Marcas
+                    </label>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {availableBrands.map(brand => (
+                        <label key={brand} className="flex items-center space-x-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={selectedBrandsFilter.includes(brand)}
+                            onChange={() => {
+                              setSelectedBrandsFilter(prev => 
+                                prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+                              );
+                            }}
+                            className="w-4 h-4 rounded text-orange-500 focus:ring-orange-500"
                           />
-                        </div>
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                        
-                        <div className="relative z-10 p-10 text-white">
-                          <div className="flex items-center justify-between mb-6">
-                            <div className="w-28 h-28 rounded-2xl bg-white/20 backdrop-blur-lg flex items-center justify-center overflow-hidden border-2 border-white/30">
-                              <img 
-                                src={item.image} 
-                                alt={item.title}
-                                className="w-full h-full object-cover"
+                          <span className="text-gray-700">{brand}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Solo con stock */}
+                  <div className="mb-4">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={onlyStock}
+                        onChange={(e) => setOnlyStock(e.target.checked)}
+                        className="w-4 h-4 rounded text-green-500 focus:ring-green-500"
+                      />
+                      <span className="text-sm font-bold text-gray-700">Solo con stock</span>
+                    </label>
+                  </div>
+
+                  {/* Botón Buscar */}
+                  <button
+                    onClick={handleSearch}
+                    disabled={searching}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-bold hover:scale-105 transition-transform disabled:opacity-50 text-sm"
+                  >
+                    {searching ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Buscando...
+                      </span>
+                    ) : "Buscar"}
+                  </button>
+                </div>
+              </aside>
+
+              {/* Contenido Central - Resultados */}
+              <main className="flex-1">
+                {searchResults.length > 0 ? (
+                  <div className="space-y-4">
+                    {searchResults.map((result, idx) => (
+                      <div key={idx} className="bg-white rounded-xl shadow-lg border-2 border-gray-200 overflow-hidden hover:border-orange-500 transition-all">
+                        <div className="p-4">
+                          <div className="flex gap-4 mb-4">
+                            {result.image_url && (
+                              <img
+                                src={result.image_url}
+                                alt={result.name}
+                                className="w-20 h-20 object-contain bg-gray-50 rounded-lg flex-shrink-0"
+                                onError={(e) => { e.target.style.display = 'none'; }}
                               />
+                            )}
+                            <div className="flex-1">
+                              <h4 className="font-bold text-gray-900 text-lg mb-1">{result.name}</h4>
+                              <p className="text-sm text-gray-600">Marca: {result.brand}</p>
                             </div>
-                            <span className="text-white/80 text-lg font-bold bg-white/20 backdrop-blur-lg px-4 py-2 rounded-full">
-                              {index + 1} / {categories.length}
-                            </span>
                           </div>
-                          <h3 className="text-4xl sm:text-5xl font-black mb-4 drop-shadow-lg">{item.title}</h3>
-                          <p className="text-xl text-white/90 leading-relaxed mb-6">{item.desc}</p>
-                          <Link 
-                            href={`/productos?category=${item.slug}`}
-                            className="inline-block px-8 py-3 bg-white text-gray-800 rounded-full font-bold hover:scale-105 transition-transform duration-300 shadow-xl hover:bg-orange-400 hover:text-white"
-                          >
-                            Ver productos
-                          </Link>
+                          
+                          {/* Tabla comparativa de precios */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                            {result.stores.map((store, sIdx) => (
+                              <div key={sIdx} className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 border-2 border-gray-200 hover:border-orange-500 transition-all">
+                                <p className="text-xs font-bold text-orange-600 uppercase mb-2">
+                                  {store.storeName}
+                                </p>
+                                <p className="text-xl font-black text-gray-900 mb-1">
+                                  ${store.price_usd?.toFixed(2)}
+                                </p>
+                                <p className="text-xs text-gray-600 mb-2">
+                                  S/ {store.price_local?.toFixed(2)}
+                                </p>
+                                <p className={`text-xs font-semibold mb-2 ${store.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {store.stock > 0 ? `✓ Stock: ${store.stock}` : '✗ Sin stock'}
+                                </p>
+                                {store.source_url && (
+                                  <a
+                                    href={store.source_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg font-bold transition-colors"
+                                  >
+                                    Ver en tienda →
+                                  </a>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-12 text-center">
+                    <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p className="text-gray-600 font-medium text-lg">
+                      {searching ? "Buscando productos..." : "Utiliza los filtros para comparar precios"}
+                    </p>
+                  </div>
+                )}
+              </main>
+
+              {/* Filtros Derecha - Tiendas y Precio */}
+              <aside className="w-64 flex-shrink-0">
+                <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-5 sticky top-4">
+                  <h3 className="text-lg font-black text-gray-900 mb-4 pb-3 border-b-2 border-cyan-500">
+                    Filtros
+                  </h3>
+
+                  {/* Tiendas */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      Tiendas
+                    </label>
+                    <div className="space-y-2">
+                      {storesList.map(store => (
+                        <label key={store} className="flex items-center space-x-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={selectedStoresFilter.includes(store)}
+                            onChange={() => {
+                              setSelectedStoresFilter(prev => 
+                                prev.includes(store) ? prev.filter(s => s !== store) : [...prev, store]
+                              );
+                            }}
+                            className="w-4 h-4 rounded text-orange-500 focus:ring-orange-500"
+                          />
+                          <span className="text-gray-700">
+                            {store === 'computershop' ? 'ComputerShop' : 
+                             store === 'cyccomputer' ? 'CYC Computer' : 
+                             store === 'pcimpacto' ? 'PCImpacto' : 'SercoPlus'}
+                          </span>
+                        </label>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Navigation Dots */}
-              <div className="flex justify-center gap-3 mt-8">
-                {categories.map((_, index) => (
+                  {/* Rango de Precio */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      Precio Máximo: ${priceRangeFilter[1]}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      step="50"
+                      value={priceRangeFilter[1]}
+                      onChange={(e) => setPriceRangeFilter([0, Number(e.target.value)])}
+                      className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                    />
+                    <div className="flex justify-between text-xs text-gray-600 mt-1">
+                      <span>$0</span>
+                      <span>$1000</span>
+                    </div>
+                  </div>
+
+                  {/* Aplicar Filtros */}
                   <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`transition-all duration-300 rounded-full ${
-                      currentSlide === index 
-                        ? 'w-12 h-3 bg-gradient-to-r from-orange-400 to-orange-600' 
-                        : 'w-3 h-3 bg-gray-300 hover:bg-orange-300'
-                    }`}
-                    aria-label={`Ir a slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-
-              {/* Navigation Arrows */}
-              <button
-                onClick={() => setCurrentSlide((prev) => (prev - 1 + categories.length) % categories.length)}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-14 h-14 bg-gray-800 border-2 border-orange-500 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform duration-300 group"
-                aria-label="Anterior"
-              >
-                <svg className="w-6 h-6 text-orange-400 group-hover:text-orange-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setCurrentSlide((prev) => (prev + 1) % categories.length)}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-14 h-14 bg-gray-800 border-2 border-orange-500 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform duration-300 group"
-                aria-label="Siguiente"
-              >
-                <svg className="w-6 h-6 text-orange-400 group-hover:text-orange-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+                    onClick={handleSearch}
+                    className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm rounded-lg font-bold transition-colors"
+                  >
+                    Aplicar Filtros
+                  </button>
+                </div>
+              </aside>
             </div>
           </div>
         </section>
 
-        {/* Stores Section */}
+        {/* Stores Section - Slider Horizontal Simple */}
         <section className="py-20 bg-black">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-4xl sm:text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600">
                 Tiendas Asociadas
               </h2>
-              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              <p className="text-gray-400 text-lg">
                 Comparamos precios en tiempo real
               </p>
             </div>
 
-            {/* Featured Store Display */}
-            <div className="max-w-4xl mx-auto mb-10">
-              <div className={`relative bg-gradient-to-br ${stores[currentStore].color} rounded-3xl p-12 shadow-2xl transform transition-all duration-500 overflow-hidden`}>
-                <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-                
-                <div className="relative z-10 text-center text-white">
-                  <div className="w-36 h-36 mx-auto mb-6 rounded-3xl bg-white backdrop-blur-lg flex items-center justify-center p-5 shadow-2xl">
-                    {stores[currentStore].logo ? (
-                      <img 
-                        src={stores[currentStore].logo}
-                        alt={stores[currentStore].name}
-                        className="max-w-full max-h-full object-contain"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <span className="text-4xl font-black text-gray-800">
-                        {stores[currentStore].name.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-4xl sm:text-5xl font-black mb-3 drop-shadow-lg">{stores[currentStore].name}</h3>
-                  <p className="text-xl text-white/90 mb-6">{stores[currentStore].desc}</p>
-                  <Link 
-                    href="/productos"
-                    className="inline-block px-8 py-3 bg-white text-gray-800 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-300 shadow-xl hover:bg-orange-400 hover:text-white"
-                  >
-                    Ver productos
-                  </Link>
+            {/* Slider Horizontal de Tiendas */}
+            <div className="relative overflow-hidden">
+              <div className="overflow-x-auto pb-6 scrollbar-hide">
+                <div className="flex gap-6 min-w-max px-2">
+                  {stores.map((store, index) => (
+                    <div key={index} className="w-72 bg-gray-900 rounded-2xl border-2 border-gray-800 hover:border-orange-500 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-orange-500/20 flex-shrink-0">
+                      <div className={`h-1 bg-gradient-to-r ${store.color}`}></div>
+                      
+                      <div className="p-6">
+                        <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-white flex items-center justify-center p-4">
+                          {store.logo ? (
+                            <img 
+                              src={store.logo}
+                              alt={store.name}
+                              className="max-w-full max-h-full object-contain"
+                              onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                          ) : (
+                            <span className="text-3xl font-black text-gray-800">
+                              {store.name.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <h3 className="text-2xl font-black mb-2 text-white text-center">{store.name}</h3>
+                        <p className="text-sm text-gray-400 mb-4 text-center">{store.desc}</p>
+                        
+                        <Link 
+                          href="/productos"
+                          className="block text-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full font-bold hover:scale-105 transition-transform duration-300"
+                        >
+                          Ver productos
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            {/* Store Selector */}
-            <div className="flex flex-wrap justify-center gap-4">
-              {stores.map((store, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentStore(index)}
-                  className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform ${
-                    currentStore === index
-                      ? `bg-gradient-to-r ${store.color} text-white shadow-xl scale-110 border-2 border-orange-400`
-                      : 'bg-gray-800 text-gray-300 shadow-md hover:shadow-lg hover:scale-105 border-2 border-gray-700 hover:border-orange-400'
-                  }`}
-                >
-                  {store.name}
-                </button>
-              ))}
+              
+              {/* Indicador de scroll */}
+              <div className="text-center mt-2">
+                <p className="text-sm text-gray-500">← Desliza para ver todas las tiendas →</p>
+              </div>
             </div>
           </div>
         </section>
