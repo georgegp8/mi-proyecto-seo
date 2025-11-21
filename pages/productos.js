@@ -115,6 +115,18 @@ export default function Productos() {
         <title>Componentes de PC - {componentType} | TechStore Perú</title>
         <meta name="description" content={`Encuentra los mejores ${componentType} en Perú. Compara precios entre SercoPlus, PCImpacto y MemoryKings. AMD, Intel, NVIDIA y más marcas.`} />
         <meta name="keywords" content={`${componentType} Perú, comprar ${componentType}, precios ${componentType}, componentes PC`} />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://mi-proyecto-seo-psi.vercel.app/productos?category=${componentType}`} />
+        <meta property="og:title" content={`Componentes de PC - ${componentType} | TechStore Perú`} />
+        <meta property="og:description" content={`Encuentra los mejores ${componentType} en Perú. Compara precios entre las mejores tiendas.`} />
+        <meta property="og:image" content="/images/cocker-spaniel.webp" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={`https://mi-proyecto-seo-psi.vercel.app/productos?category=${componentType}`} />
+        <meta name="twitter:title" content={`Componentes de PC - ${componentType} | TechStore Perú`} />
+        <meta name="twitter:description" content={`Encuentra los mejores ${componentType} en Perú. Compara precios.`} />
+        <meta name="twitter:image" content="/images/cocker-spaniel.webp" />
       </Head>
 
       <Navbar />
