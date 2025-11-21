@@ -298,15 +298,20 @@ export default function Home() {
                 
                 <div className="relative z-10 text-center text-white">
                   <div className="w-40 h-40 mx-auto mb-8 rounded-3xl bg-white backdrop-blur-lg flex items-center justify-center p-6 shadow-2xl">
-                    <img 
-                      src={stores[currentStore].logo}
-                      alt={stores[currentStore].name}
-                      className="max-w-full max-h-full object-contain"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.parentElement.innerHTML = `<span class="text-4xl font-black text-gray-800">${stores[currentStore].name.charAt(0)}</span>`;
-                      }}
-                    />
+                    {stores[currentStore].logo ? (
+                      <img 
+                        src={stores[currentStore].logo}
+                        alt={stores[currentStore].name}
+                        className="max-w-full max-h-full object-contain"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <span className="text-4xl font-black text-gray-800">
+                        {stores[currentStore].name.charAt(0)}
+                      </span>
+                    )}
                   </div>
                   <h3 className="text-5xl font-black mb-4 drop-shadow-lg">{stores[currentStore].name}</h3>
                   <p className="text-2xl text-white/90 mb-8">{stores[currentStore].desc}</p>
