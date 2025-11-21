@@ -2,16 +2,16 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-black border-t-2 border-orange-500 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo y Descripción */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-xl">T</span>
               </div>
-              <span className="text-2xl font-black">TechStore Perú</span>
+              <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">TechStore Perú</span>
             </div>
             <p className="text-gray-400 mb-4">
               Compara precios de componentes de PC en las mejores tiendas de Perú.
@@ -41,17 +41,17 @@ export default function Footer() {
             <h3 className="text-lg font-bold mb-4">Enlaces Rápidos</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/" className="text-gray-400 hover:text-orange-400 transition-colors">
                   Inicio
                 </Link>
               </li>
               <li>
-                <Link href="/productos" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/productos" className="text-gray-400 hover:text-cyan-400 transition-colors">
                   Productos
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/contacto" className="text-gray-400 hover:text-orange-400 transition-colors">
                   Contacto
                 </Link>
               </li>
