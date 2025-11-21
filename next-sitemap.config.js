@@ -1,14 +1,13 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
   siteUrl: 'https://mi-proyecto-seo.vercel.app',
-  generateRobotsTxt: false, // Ya tenemos robots.txt
+  generateRobotsTxt: false,
+  generateIndexSitemap: false, // No generar sitemap index, solo sitemap.xml
+  outDir: './public',
   changefreq: 'daily',
   priority: 0.7,
-  sitemapSize: 5000,
-  exclude: [],
   
   transform: async (config, path) => {
-    // Configuración personalizada para cada página
     if (path === '/') {
       return {
         loc: path,
@@ -36,7 +35,6 @@ module.exports = {
       }
     }
 
-    // URLs con parámetros de categoría
     return {
       loc: path,
       changefreq: 'daily',
