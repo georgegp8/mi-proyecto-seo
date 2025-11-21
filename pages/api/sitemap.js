@@ -1,6 +1,4 @@
 // GUERRA PACHECO GEORGE MIKY -5C24B
-// pages/sitemap.xml.js
-
 const BASE_URL = "https://mi-proyecto-seo-psi.vercel.app";
 
 function generateSitemap() {
@@ -59,7 +57,7 @@ ${allUrls
   return xml;
 }
 
-export async function getServerSideProps({ res }) {
+export default function handler(req, res) {
   const sitemap = generateSitemap();
 
   res.setHeader("Content-Type", "application/xml; charset=UTF-8");
@@ -67,13 +65,5 @@ export async function getServerSideProps({ res }) {
     "Cache-Control",
     "public, s-maxage=86400, stale-while-revalidate=604800"
   );
-  res.write(sitemap);
-  res.end();
-
-  return { props: {} };
-}
-
-// No renderiza nada en React; solo sirve para que Next no falle
-export default function SiteMap() {
-  return null;
+  res.status(200).send(sitemap);
 }
