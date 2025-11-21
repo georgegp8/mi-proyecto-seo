@@ -1,6 +1,9 @@
 // GUERRA PACHECO GEORGE MIKY -5C24B
 import Head from "next/head";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+
+const DynamicComponent = dynamic(() => import("../components/LargeComponent"), { ssr: false });
 
 export default function Home() {
   return (
@@ -23,6 +26,7 @@ export default function Home() {
         alt="Ejemplo de imagen optimizada"
         priority
       />
+      <DynamicComponent />
     </>
   );
 }
