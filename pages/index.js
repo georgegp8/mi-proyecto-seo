@@ -18,7 +18,13 @@ export default function Home() {
         <meta property="og:type" content="website" />
       </Head>
 
-      <h1>Bienvenido</h1>
+      <h1 style={{ fontSize: "3rem", fontWeight: "900", marginBottom: "1rem" }}>Bienvenido</h1>
+      <p style={{ fontSize: "1.25rem", fontWeight: "300", fontStyle: "italic", marginBottom: "1rem" }}>
+        Optimización SEO y rendimiento en Next.js
+      </p>
+      <p style={{ fontSize: "1rem", fontWeight: "600", marginBottom: "2rem" }}>
+        Ejemplo de diferentes pesos y tamaños de fuente
+      </p>
 
       <DynamicComponent />
     </>
