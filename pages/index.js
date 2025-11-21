@@ -11,7 +11,7 @@ export default function Home() {
         <meta name="keywords" content="Next.js, SEO, optimización web" />
         <meta property="og:title" content="Mi Sitio Optimizado" />
         <meta property="og:description" content="Descubre técnicas avanzadas para mejorar tu web con Next.js." />
-        <meta property="og:image" content="/images/seo-image.png" />
+        <meta property="og:image" content="/images/cocker-spaniel.webp" />
         <meta property="og:type" content="website" />
       </Head>
 
