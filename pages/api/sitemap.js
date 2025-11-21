@@ -106,7 +106,7 @@ ${allUrls
       .map(
         (item) =>
           `  <url>
-    <loc>${BASE_URL}${item.url}</loc>
+    <loc>${BASE_URL}${item.url.replace(/&/g, '&amp;')}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${item.changefreq}</changefreq>
     <priority>${item.priority}</priority>
