@@ -1,10 +1,9 @@
 // GUERRA PACHECO GEORGE MIKY -5C24B
 const BASE_URL = "https://mi-proyecto-seo-psi.vercel.app";
-const API_BASE = "https://web-production-0c2d.up.railway.app";
 
 export default async function handler(req, res) {
   try {
-    // Tiendas y categorías actualizadas
+    // Tiendas y categorías
     const stores = ["computershop", "cyccomputer", "pcimpacto", "sercoplus"];
     const categories = [
       "procesadores",
@@ -35,7 +34,7 @@ export default async function handler(req, res) {
       changefreq: "monthly"
     });
     
-    // Agregar URLs por categoría (alta prioridad - páginas de landing)
+    // Agregar URLs por categoría
     for (const category of categories) {
       allUrls.push({
         url: `/productos?category=${category}`,
@@ -43,45 +42,6 @@ export default async function handler(req, res) {
         changefreq: "daily"
       });
     }
-    
-    // Obtener productos dinámicos desde la API para generar URLs
-    const productUrls = new Set();
-    
-    for (const store of stores) {
-      try {
-        const response = await fetch(
-          `${API_BASE}/api/stores/${store}/products`,
-          { 
-            signal: AbortSignal.timeout(5000)
-          }
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Agregar URLs de productos individuales (primeros 50 por tienda)
-          if (data.products && Array.isArray(data.products)) {
-            data.products.slice(0, 50).forEach(product => {
-              if (product.id) {
-                // URL única por producto
-                productUrls.add(`/productos?store=${store}&id=${product.id}`);
-              }
-            });
-          }
-        }
-      } catch (error) {
-        console.error(`Error fetching from ${store}:`, error.message);
-      }
-    }
-    
-    // Agregar productos únicos al sitemap
-    productUrls.forEach(url => {
-      allUrls.push({
-        url,
-        priority: "0.6",
-        changefreq: "weekly"
-      });
-    });
     
     // Agregar combinaciones de tienda + categoría
     for (const store of stores) {
@@ -98,10 +58,7 @@ export default async function handler(req, res) {
     const lastmod = new Date().toISOString().split('T')[0];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allUrls
       .map(
         (item) =>
@@ -116,7 +73,7 @@ ${allUrls
 </urlset>`;
 
     res.setHeader("Content-Type", "text/xml; charset=UTF-8");
-    res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+    res.setHeader("Cache-Control", "public, s-maxage=86400, stale-while-revalidate=604800");
     res.status(200).send(sitemap);
   } catch (error) {
     console.error("Error generating sitemap:", error);
