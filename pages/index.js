@@ -1,5 +1,6 @@
 // GUERRA PACHECO GEORGE MIKY -5C24B
 import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
@@ -394,9 +395,11 @@ export default function Home() {
                           <div className="p-4">
                             <div className="flex gap-4 mb-4">
                               {result.image_url && (
-                                <img
+                                <Image
                                   src={result.image_url}
                                   alt={result.name}
+                                  width={80}
+                                  height={80}
                                   className="w-20 h-20 object-contain bg-gray-50 rounded-lg flex-shrink-0"
                                   onError={(e) => { e.target.style.display = 'none'; }}
                                 />
@@ -601,9 +604,11 @@ export default function Home() {
                       <div className="p-6">
                         <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-white flex items-center justify-center p-4">
                           {store.logo ? (
-                            <img 
+                            <Image 
                               src={store.logo}
                               alt={store.name}
+                              width={96}
+                              height={96}
                               className="max-w-full max-h-full object-contain"
                               onError={(e) => { e.target.style.display = 'none'; }}
                             />
