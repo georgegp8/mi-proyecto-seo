@@ -183,7 +183,7 @@ export default function Home() {
       slug: "computershop",
       color: "from-orange-500 to-orange-600", 
       shadow: "shadow-orange-500/50",
-      logo: "/images/computershop-logo.png",
+      logo: "/images/computershop-logo.webp",
       desc: "Especialistas en componentes gaming"
     },
     { 
@@ -191,7 +191,7 @@ export default function Home() {
       slug: "cyccomputer",
       color: "from-blue-400 to-cyan-500", 
       shadow: "shadow-cyan-500/50",
-      logo: "/images/cyccomputer-logo.jpg",
+      logo: "/images/cyccomputer-logo.webp",
       desc: "Tu tienda de confianza en tecnología"
     },
     { 
@@ -199,7 +199,7 @@ export default function Home() {
       slug: "pcimpacto",
       color: "from-gray-700 to-gray-900", 
       shadow: "shadow-gray-500/50",
-      logo: "/images/pcimpacto-logo.png",
+      logo: "/images/pcimpacto-logo.webp",
       desc: "Rendimiento y calidad garantizada"
     },
     { 
@@ -207,7 +207,7 @@ export default function Home() {
       slug: "sercoplus",
       color: "from-orange-600 to-orange-700", 
       shadow: "shadow-orange-600/50",
-      logo: "/images/sercoplus-logo.jpg",
+      logo: "/images/sercoplus-logo.webp",
       desc: "Líderes en hardware y componentes"
     },
   ];
