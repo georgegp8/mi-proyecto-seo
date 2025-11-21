@@ -4,8 +4,8 @@ const API_BASE = "https://web-production-0c2d.up.railway.app";
 
 export default async function handler(req, res) {
   try {
-    // Obtener productos reales de la API para generar URLs dinámicas
-    const stores = ["sercoplus", "pcimpacto", "memorykings"];
+    // Tiendas y categorías actualizadas
+    const stores = ["computershop", "cyccomputer", "pcimpacto", "sercoplus"];
     const categories = [
       "procesadores",
       "tarjetas-video",
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     
     const allUrls = [];
     
-    // Agregar rutas estáticas
+    // Agregar rutas estáticas principales
     allUrls.push({
       url: "/",
       priority: "1.0",
@@ -35,30 +35,62 @@ export default async function handler(req, res) {
       changefreq: "monthly"
     });
     
-    // Obtener productos de cada tienda y categoría desde la API
+    // Agregar URLs por categoría (alta prioridad - páginas de landing)
+    for (const category of categories) {
+      allUrls.push({
+        url: `/productos?category=${category}`,
+        priority: "0.8",
+        changefreq: "daily"
+      });
+    }
+    
+    // Obtener productos dinámicos desde la API para generar URLs
+    const productUrls = new Set();
+    
     for (const store of stores) {
-      for (const category of categories) {
-        try {
-          const response = await fetch(
-            `${API_BASE}/api/stores/${store}/products?component_type=${category}&limit=5`,
-            { timeout: 5000 }
-          );
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/stores/${store}/products`,
+          { 
+            signal: AbortSignal.timeout(5000)
+          }
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
           
-          if (response.ok) {
-            allUrls.push({
-              url: `/productos?store=${store}&category=${category}`,
-              priority: "0.8",
-              changefreq: "weekly"
+          // Agregar URLs de productos individuales (primeros 50 por tienda)
+          if (data.products && Array.isArray(data.products)) {
+            data.products.slice(0, 50).forEach(product => {
+              if (product.id) {
+                // URL única por producto
+                productUrls.add(`/productos?store=${store}&id=${product.id}`);
+              }
             });
           }
-        } catch (error) {
-          // Si falla la API, aún agregar la URL
-          allUrls.push({
-            url: `/productos?store=${store}&category=${category}`,
-            priority: "0.8",
-            changefreq: "weekly"
-          });
         }
+      } catch (error) {
+        console.error(`Error fetching from ${store}:`, error.message);
+      }
+    }
+    
+    // Agregar productos únicos al sitemap
+    productUrls.forEach(url => {
+      allUrls.push({
+        url,
+        priority: "0.6",
+        changefreq: "weekly"
+      });
+    });
+    
+    // Agregar combinaciones de tienda + categoría
+    for (const store of stores) {
+      for (const category of categories) {
+        allUrls.push({
+          url: `/productos?store=${store}&category=${category}`,
+          priority: "0.7",
+          changefreq: "weekly"
+        });
       }
     }
     
@@ -66,7 +98,10 @@ export default async function handler(req, res) {
     const lastmod = new Date().toISOString().split('T')[0];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${allUrls
       .map(
         (item) =>
@@ -81,7 +116,7 @@ ${allUrls
 </urlset>`;
 
     res.setHeader("Content-Type", "text/xml; charset=UTF-8");
-    res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
+    res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
     res.status(200).send(sitemap);
   } catch (error) {
     console.error("Error generating sitemap:", error);
