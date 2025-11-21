@@ -27,24 +27,89 @@ export default function Home() {
   // Auto-rotate stores
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentStore((prev) => (prev + 1) % 3);
-    }, 3000);
+      setCurrentStore((prev) => (prev + 1) % 4);
+    }, 3500);
     return () => clearInterval(timer);
   }, []);
 
   const categories = [
-    { title: "Procesadores", desc: "AMD Ryzen, Intel Core - Máximo rendimiento", color: "from-blue-500 to-cyan-500", border: "border-blue-500" },
-    { title: "Tarjetas de Video", desc: "NVIDIA, AMD - Gaming y diseño profesional", color: "from-purple-500 to-pink-500", border: "border-purple-500" },
-    { title: "Memoria RAM", desc: "Kingston, Corsair - Velocidad garantizada", color: "from-green-500 to-emerald-500", border: "border-green-500" },
-    { title: "Almacenamiento", desc: "SSD, NVMe - Rapidez extrema", color: "from-orange-500 to-red-500", border: "border-orange-500" },
-    { title: "Placas Madre", desc: "ASUS, MSI, Gigabyte - Calidad premium", color: "from-indigo-500 to-purple-500", border: "border-indigo-500" },
-    { title: "Periféricos", desc: "Teclados, Mouse - Gaming gear", color: "from-pink-500 to-rose-500", border: "border-pink-500" },
+    { 
+      title: "Procesadores", 
+      desc: "AMD Ryzen, Intel Core - Máximo rendimiento", 
+      color: "from-blue-500 to-cyan-500", 
+      border: "border-blue-500",
+      image: "https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=400&h=400&fit=crop"
+    },
+    { 
+      title: "Tarjetas de Video", 
+      desc: "NVIDIA, AMD - Gaming y diseño profesional", 
+      color: "from-purple-500 to-pink-500", 
+      border: "border-purple-500",
+      image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=400&fit=crop"
+    },
+    { 
+      title: "Memoria RAM", 
+      desc: "Kingston, Corsair - Velocidad garantizada", 
+      color: "from-green-500 to-emerald-500", 
+      border: "border-green-500",
+      image: "https://images.unsplash.com/photo-1562976540-1502c2145186?w=400&h=400&fit=crop"
+    },
+    { 
+      title: "Almacenamiento", 
+      desc: "SSD, NVMe - Rapidez extrema", 
+      color: "from-orange-500 to-red-500", 
+      border: "border-orange-500",
+      image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400&h=400&fit=crop"
+    },
+    { 
+      title: "Placas Madre", 
+      desc: "ASUS, MSI, Gigabyte - Calidad premium", 
+      color: "from-indigo-500 to-purple-500", 
+      border: "border-indigo-500",
+      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=400&fit=crop"
+    },
+    { 
+      title: "Periféricos", 
+      desc: "Teclados, Mouse - Gaming gear", 
+      color: "from-pink-500 to-rose-500", 
+      border: "border-pink-500",
+      image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=400&fit=crop"
+    },
   ];
 
   const stores = [
-    { name: "SercoPlus", color: "from-blue-600 to-blue-400", shadow: "shadow-blue-500/50" },
-    { name: "PCImpacto", color: "from-purple-600 to-purple-400", shadow: "shadow-purple-500/50" },
-    { name: "MemoryKings", color: "from-pink-600 to-pink-400", shadow: "shadow-pink-500/50" },
+    { 
+      name: "ComputerShop", 
+      slug: "computershop",
+      color: "from-blue-600 to-blue-400", 
+      shadow: "shadow-blue-500/50",
+      logo: "https://computershop.pe/assets/img/logo.png",
+      desc: "Especialistas en componentes gaming"
+    },
+    { 
+      name: "CYC Computer", 
+      slug: "cyccomputer",
+      color: "from-green-600 to-green-400", 
+      shadow: "shadow-green-500/50",
+      logo: "https://cyccomputer.com/wp-content/uploads/2023/01/logo-cyc.png",
+      desc: "Tu tienda de confianza en tecnología"
+    },
+    { 
+      name: "PCImpacto", 
+      slug: "pcimpacto",
+      color: "from-purple-600 to-purple-400", 
+      shadow: "shadow-purple-500/50",
+      logo: "https://pcimpacto.com/wp-content/uploads/2022/07/logo-pc-impacto.png",
+      desc: "Rendimiento y calidad garantizada"
+    },
+    { 
+      name: "SercoPlus", 
+      slug: "sercoplus",
+      color: "from-orange-600 to-orange-400", 
+      shadow: "shadow-orange-500/50",
+      logo: "https://sercoplus.com/img/sercoplus.png",
+      desc: "Líderes en hardware y componentes"
+    },
   ];
 
   return (
@@ -91,7 +156,7 @@ export default function Home() {
                 Encuentra los mejores precios en componentes de PC
               </p>
               <p className="text-lg mb-12 text-pink-50 max-w-2xl mx-auto">
-                Compara precios en tiempo real entre las tiendas líderes: SercoPlus, PCImpacto y MemoryKings
+                Compara precios en tiempo real entre ComputerShop, CYC Computer, PCImpacto y SercoPlus
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -136,20 +201,34 @@ export default function Home() {
                 >
                   {categories.map((item, index) => (
                     <div key={index} className="min-w-full px-4">
-                      <div className={`relative bg-gradient-to-br ${item.color} rounded-2xl p-12 shadow-2xl`}>
+                      <div className={`relative bg-gradient-to-br ${item.color} rounded-3xl overflow-hidden shadow-2xl`}>
+                        <div className="absolute inset-0 opacity-20">
+                          <img 
+                            src={item.image} 
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                        <div className="relative z-10 text-white">
+                        
+                        <div className="relative z-10 p-12 text-white">
                           <div className="flex items-center justify-between mb-8">
-                            <div className="w-24 h-24 rounded-2xl bg-white/20 backdrop-blur-lg flex items-center justify-center">
-                              <div className="w-12 h-12 bg-white rounded-lg"></div>
+                            <div className="w-32 h-32 rounded-2xl bg-white/20 backdrop-blur-lg flex items-center justify-center overflow-hidden">
+                              <img 
+                                src={item.image} 
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                            <span className="text-white/60 text-lg font-medium">{index + 1} / {categories.length}</span>
+                            <span className="text-white/80 text-xl font-bold bg-white/20 backdrop-blur-lg px-4 py-2 rounded-full">
+                              {index + 1} / {categories.length}
+                            </span>
                           </div>
-                          <h3 className="text-4xl font-black mb-4">{item.title}</h3>
-                          <p className="text-xl text-white/90 leading-relaxed">{item.desc}</p>
+                          <h3 className="text-5xl font-black mb-4 drop-shadow-lg">{item.title}</h3>
+                          <p className="text-2xl text-white/90 leading-relaxed mb-8">{item.desc}</p>
                           <Link 
                             href="/productos"
-                            className="inline-block mt-8 px-8 py-4 bg-white text-gray-800 rounded-full font-bold hover:scale-105 transition-transform duration-300 shadow-xl"
+                            className="inline-block px-10 py-4 bg-white text-gray-800 rounded-full font-bold hover:scale-105 transition-transform duration-300 shadow-xl"
                           >
                             Ver productos
                           </Link>
@@ -213,18 +292,24 @@ export default function Home() {
 
             {/* Featured Store Display */}
             <div className="max-w-4xl mx-auto mb-12">
-              <div className={`relative bg-gradient-to-br ${stores[currentStore].color} rounded-3xl p-16 shadow-2xl transform transition-all duration-500`}>
+              <div className={`relative bg-gradient-to-br ${stores[currentStore].color} rounded-3xl p-16 shadow-2xl transform transition-all duration-500 overflow-hidden`}>
                 <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
                 
                 <div className="relative z-10 text-center text-white">
-                  <div className="w-32 h-32 mx-auto mb-8 rounded-3xl bg-white/20 backdrop-blur-lg flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
+                  <div className="w-40 h-40 mx-auto mb-8 rounded-3xl bg-white backdrop-blur-lg flex items-center justify-center p-6 shadow-2xl">
+                    <img 
+                      src={stores[currentStore].logo}
+                      alt={stores[currentStore].name}
+                      className="max-w-full max-h-full object-contain"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.parentElement.innerHTML = `<span class="text-4xl font-black text-gray-800">${stores[currentStore].name.charAt(0)}</span>`;
+                      }}
+                    />
                   </div>
-                  <h3 className="text-5xl font-black mb-6">{stores[currentStore].name}</h3>
-                  <p className="text-2xl text-white/90 mb-8">Amplio catálogo de componentes de PC</p>
+                  <h3 className="text-5xl font-black mb-4 drop-shadow-lg">{stores[currentStore].name}</h3>
+                  <p className="text-2xl text-white/90 mb-8">{stores[currentStore].desc}</p>
                   <div className="flex justify-center gap-4">
                     <Link 
                       href="/productos"

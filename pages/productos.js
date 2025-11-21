@@ -76,9 +76,10 @@ export default function Productos() {
                   onChange={(e) => setStore(e.target.value)}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
                 >
-                  <option value="sercoplus">SercoPlus</option>
+                  <option value="computershop">ComputerShop</option>
+                  <option value="cyccomputer">CYC Computer</option>
                   <option value="pcimpacto">PCImpacto</option>
-                  <option value="memorykings">MemoryKings</option>
+                  <option value="sercoplus">SercoPlus</option>
                 </select>
               </div>
 

@@ -62,9 +62,10 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Tiendas</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">SercoPlus</li>
+              <li className="text-gray-400">ComputerShop</li>
+              <li className="text-gray-400">CYC Computer</li>
               <li className="text-gray-400">PCImpacto</li>
-              <li className="text-gray-400">MemoryKings</li>
+              <li className="text-gray-400">SercoPlus</li>
             </ul>
           </div>
         </div>
