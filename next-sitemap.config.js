@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: 'https://mi-proyecto-seo.vercel.app',
+  siteUrl: 'https://mi-proyecto-seo-psi.vercel.app',
   generateRobotsTxt: false,
   generateIndexSitemap: false, // No generar sitemap index, solo sitemap.xml
   outDir: './public',
