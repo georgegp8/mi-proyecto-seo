@@ -1,6 +1,5 @@
 // GUERRA PACHECO GEORGE MIKY -5C24B
 import Head from "next/head";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -317,11 +316,10 @@ export default function Productos() {
                       >
                         {product.image_url && (
                           <div className="bg-white p-4 h-48 flex items-center justify-center relative overflow-hidden">
-                            <Image 
-                              src={product.image_url} 
+                            <img 
+                              src={decodeURIComponent(product.image_url)} 
                               alt={product.name}
-                              width={200}
-                              height={200}
+                              loading="lazy"
                               className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
                               onError={(e) => { e.target.style.display = 'none'; }}
                             />
