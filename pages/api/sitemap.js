@@ -4,6 +4,9 @@ const BASE_URL = "https://mi-proyecto-seo-psi.vercel.app";
 export default async function handler(req, res) {
   const urls = ["/", "/blog", "/contacto"]; 
 
+  // Formato W3C Datetime (YYYY-MM-DD)
+  const lastmod = new Date().toISOString().split('T')[0];
+
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
@@ -11,7 +14,7 @@ ${urls
       (url) =>
         `  <url>
     <loc>${BASE_URL}${url}</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`
@@ -19,7 +22,6 @@ ${urls
     .join("\n")}
 </urlset>`;
 
-  res.setHeader("Content-Type", "text/xml");
-  res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate");
+  res.setHeader("Content-Type", "text/xml; charset=UTF-8");
   res.status(200).send(sitemap);
 }
