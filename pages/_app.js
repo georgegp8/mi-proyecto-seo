@@ -1,5 +1,6 @@
 // GUERRA PACHECO GEORGE MIKY -5C24B
 import { Inter } from "next/font/google";
+import "../app/animations.css";
 
 const inter = Inter({ 
   subsets: ["latin"],
