@@ -1,4 +1,4 @@
-export default function handler(req, res) {
+export async function getServerSideProps({ res }) {
   const baseUrl = 'https://mi-proyecto-seo.vercel.app';
   
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -47,5 +47,14 @@ export default function handler(req, res) {
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-  res.status(200).send(sitemap);
+  res.write(sitemap);
+  res.end();
+
+  return {
+    props: {},
+  };
+}
+
+export default function Sitemap() {
+  return null;
 }
