@@ -17,6 +17,8 @@ export default function Home() {
   const [selectedBrandsFilter, setSelectedBrandsFilter] = useState([]);
   const [priceRangeFilter, setPriceRangeFilter] = useState([0, 1000]);
   const [onlyStock, setOnlyStock] = useState(true); // Por defecto solo con stock
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -26,6 +28,7 @@ export default function Home() {
 
   // Cargar productos iniciales al montar el componente
   useEffect(() => {
+    setCurrentPage(1); // Resetear a página 1 cuando cambia categoría
     loadInitialProducts();
   }, [selectedCategory]);
 
@@ -123,6 +126,7 @@ export default function Home() {
 
   // Función de búsqueda/filtrado
   const handleSearch = () => {
+    setCurrentPage(1); // Resetear a página 1 cuando se busca
     loadInitialProducts();
   };
 
@@ -381,58 +385,119 @@ export default function Home() {
               {/* Contenido Central - Resultados */}
               <main className="flex-1">
                 {searchResults.length > 0 ? (
-                  <div className="space-y-4">
-                    {searchResults.map((result, idx) => (
-                      <div key={idx} className="bg-white rounded-xl shadow-lg border-2 border-gray-200 overflow-hidden hover:border-orange-500 transition-all">
-                        <div className="p-4">
-                          <div className="flex gap-4 mb-4">
-                            {result.image_url && (
-                              <img
-                                src={result.image_url}
-                                alt={result.name}
-                                className="w-20 h-20 object-contain bg-gray-50 rounded-lg flex-shrink-0"
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                              />
-                            )}
-                            <div className="flex-1">
-                              <h4 className="font-bold text-gray-900 text-lg mb-1">{result.name}</h4>
-                              <p className="text-sm text-gray-600">Marca: {result.brand}</p>
+                  <>
+                    <div className="space-y-4">
+                      {searchResults
+                        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                        .map((result, idx) => (
+                        <div key={idx} className="bg-white rounded-xl shadow-lg border-2 border-gray-200 overflow-hidden hover:border-orange-500 transition-all">
+                          <div className="p-4">
+                            <div className="flex gap-4 mb-4">
+                              {result.image_url && (
+                                <img
+                                  src={result.image_url}
+                                  alt={result.name}
+                                  className="w-20 h-20 object-contain bg-gray-50 rounded-lg flex-shrink-0"
+                                  onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                              )}
+                              <div className="flex-1">
+                                <h4 className="font-bold text-gray-900 text-lg mb-1">{result.name}</h4>
+                                <p className="text-sm text-gray-600">Marca: {result.brand}</p>
+                              </div>
+                            </div>
+                            
+                            {/* Tabla comparativa de precios */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                              {result.stores.map((store, sIdx) => (
+                                <div key={sIdx} className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 border-2 border-gray-200 hover:border-orange-500 transition-all">
+                                  <p className="text-xs font-bold text-orange-600 uppercase mb-2">
+                                    {store.storeName}
+                                  </p>
+                                  <p className="text-xl font-black text-gray-900 mb-1">
+                                    ${store.price_usd?.toFixed(2)}
+                                  </p>
+                                  <p className="text-xs text-gray-600 mb-2">
+                                    S/ {store.price_local?.toFixed(2)}
+                                  </p>
+                                  <p className={`text-xs font-semibold mb-2 ${store.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {store.stock > 0 ? `✓ Stock: ${store.stock}` : '✗ Sin stock'}
+                                  </p>
+                                  {store.source_url && (
+                                    <a
+                                      href={store.source_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg font-bold transition-colors"
+                                    >
+                                      Ver en tienda →
+                                    </a>
+                                  )}
+                                </div>
+                              ))}
                             </div>
                           </div>
-                          
-                          {/* Tabla comparativa de precios */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                            {result.stores.map((store, sIdx) => (
-                              <div key={sIdx} className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 border-2 border-gray-200 hover:border-orange-500 transition-all">
-                                <p className="text-xs font-bold text-orange-600 uppercase mb-2">
-                                  {store.storeName}
-                                </p>
-                                <p className="text-xl font-black text-gray-900 mb-1">
-                                  ${store.price_usd?.toFixed(2)}
-                                </p>
-                                <p className="text-xs text-gray-600 mb-2">
-                                  S/ {store.price_local?.toFixed(2)}
-                                </p>
-                                <p className={`text-xs font-semibold mb-2 ${store.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                  {store.stock > 0 ? `✓ Stock: ${store.stock}` : '✗ Sin stock'}
-                                </p>
-                                {store.source_url && (
-                                  <a
-                                    href={store.source_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg font-bold transition-colors"
-                                  >
-                                    Ver en tienda →
-                                  </a>
-                                )}
-                              </div>
-                            ))}
-                          </div>
                         </div>
+                      ))}
+                    </div>
+
+                    {/* Paginación */}
+                    {searchResults.length > itemsPerPage && (
+                      <div className="mt-8 flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                          className="px-4 py-2 bg-white border-2 border-gray-300 rounded-lg font-bold text-gray-700 hover:border-orange-500 hover:text-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                          ← Anterior
+                        </button>
+                        
+                        <div className="flex gap-1">
+                          {Array.from({ length: Math.ceil(searchResults.length / itemsPerPage) }, (_, i) => i + 1)
+                            .filter(page => {
+                              const totalPages = Math.ceil(searchResults.length / itemsPerPage);
+                              if (totalPages <= 7) return true;
+                              if (page === 1 || page === totalPages) return true;
+                              if (page >= currentPage - 1 && page <= currentPage + 1) return true;
+                              return false;
+                            })
+                            .map((page, idx, arr) => {
+                              const showEllipsis = idx > 0 && page - arr[idx - 1] > 1;
+                              return (
+                                <div key={page} className="flex items-center gap-1">
+                                  {showEllipsis && <span className="px-2 text-gray-400">...</span>}
+                                  <button
+                                    onClick={() => setCurrentPage(page)}
+                                    className={`w-10 h-10 rounded-lg font-bold transition-all ${
+                                      currentPage === page
+                                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                                        : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-orange-500 hover:text-orange-500'
+                                    }`}
+                                  >
+                                    {page}
+                                  </button>
+                                </div>
+                              );
+                            })}
+                        </div>
+
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.min(Math.ceil(searchResults.length / itemsPerPage), prev + 1))}
+                          disabled={currentPage === Math.ceil(searchResults.length / itemsPerPage)}
+                          className="px-4 py-2 bg-white border-2 border-gray-300 rounded-lg font-bold text-gray-700 hover:border-orange-500 hover:text-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                          Siguiente →
+                        </button>
                       </div>
-                    ))}
-                  </div>
+                    )}
+
+                    {/* Indicador de resultados */}
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-gray-600">
+                        Mostrando {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, searchResults.length)} de {searchResults.length} resultados
+                      </p>
+                    </div>
+                  </>
                 ) : (
                   <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-12 text-center">
                     <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
