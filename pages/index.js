@@ -1,5 +1,6 @@
 // GUERRA PACHECO GEORGE MIKY -5C24B
 import Head from "next/head";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -14,8 +15,14 @@ export default function Home() {
         <meta property="og:type" content="website" />
       </Head>
 
-      <h1>Bienvenido a mi página optimizada</h1>
-      <p>Aprende cómo mejorar el rendimiento y SEO en Next.js.</p>
+      <h1>Bienvenido</h1>
+      <Image
+        src="/images/seo-image.png"
+        width={800}
+        height={400}
+        alt="Ejemplo de imagen optimizada"
+        priority
+      />
     </>
   );
 }
